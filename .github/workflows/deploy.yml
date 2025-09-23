@@ -46,24 +46,27 @@ jobs:
       run: |
         python manage.py collectstatic --noinput
 
-    - name: Install Heroku CLI and Deploy
+    - name: Deploy to Heroku
       env:
         HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
       run: |
         curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
         export PATH="/usr/local/bin:$PATH"
 
+        # Set git config
+        git config --global user.email "action@github.com"
+        git config --global user.name "GitHub Action"
+
         # Login to Heroku
         echo $HEROKU_API_KEY | heroku auth:token
 
-        # Add Heroku remote and deploy
-        git config --global user.email "action@github.com"
-        git config --global user.name "GitHub Action"
-        heroku git:remote --app ${{ secrets.HEROKU_APP_NAME }}
+        # Set up git remote with authentication
+        git remote add heroku https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git
 
-        # Stage all files including built frontend
+        # Stage all files
         git add .
         git commit -m "Deploy from GitHub Actions" || echo "No changes to commit"
 
-        # Push to Heroku
+        # Deploy to Heroku
         git push heroku HEAD:main --force
