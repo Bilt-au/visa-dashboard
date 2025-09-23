@@ -31,23 +31,17 @@ jobs:
           if [ -d "frontend/build" ]; then
             cp -r frontend/build/* static/
             # Convert React's index.html to Django template using Python
-            python3 << 'EOF'
+            python3 -c "
 import re
-
 with open('frontend/build/index.html', 'r') as f:
     content = f.read()
-
-# Replace static file references with Django static template tags
-content = re.sub(r'/static/([^"]+)"', r'{% static "\1" %}"', content)
-content = re.sub(r'href="([^"]*\.css)"', r'href="{% static "\1" %}"', content)
-content = re.sub(r'src="([^"]*\.js)"', r'src="{% static "\1" %}"', content)
-
-# Add Django template tag at the top
+content = re.sub(r'/static/([^\"]+)\"', r'{% static \"\1\" %}\"', content)
+content = re.sub(r'href=\"([^\"]*\.css)\"', r'href=\"{% static \"\1\" %}\"', content)
+content = re.sub(r'src=\"([^\"]*\.js)\"', r'src=\"{% static \"\1\" %}\"', content)
 final_content = '{% load static %}\n' + content
-
 with open('templates/index.html', 'w') as f:
     f.write(final_content)
-EOF
+"
             echo "Frontend build copied and template created"
           else
             echo "No frontend build directory found"
