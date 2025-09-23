@@ -27,11 +27,19 @@ jobs:
           npm install
           npm run build
           cd ..
-          mkdir -p static
-          cp -r frontend/build/* static/ || echo "No build output to copy"
+          mkdir -p static templates
+          if [ -d "frontend/build" ]; then
+            cp -r frontend/build/* static/
+            cp frontend/build/index.html templates/
+            echo "Frontend build copied to static/ and templates/"
+          else
+            echo "No frontend build directory found"
+            touch static/.gitkeep
+          fi
         else
           echo "No frontend directory found, skipping frontend build"
           mkdir -p static
+          touch static/.gitkeep
         fi
 
     - name: Set up Python
