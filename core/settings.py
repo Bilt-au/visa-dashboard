@@ -158,7 +158,7 @@ CORS_ALLOW_CREDENTIALS = True
 
 # CSRF settings for production
 CSRF_TRUSTED_ORIGINS = [
-    "https://ausvisa.bilt.au/",
+    "https://ausvisa.bilt.au",
 ]
 
 # Add production CORS origins
