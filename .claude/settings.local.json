@@ -5,7 +5,8 @@
       "Bash(pip install:*)",
       "Bash(curl:*)",
       "Bash(npx create-react-app:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(heroku create:*)"
     ],
     "deny": [],
     "ask": []
