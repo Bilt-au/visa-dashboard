@@ -18,6 +18,7 @@ function App() {
 
   useEffect(() => {
     loadFilterOptions();
+    loadFiltersFromURL();
     loadInitialData();
 
     // Load Buy Me a Coffee script
@@ -54,6 +55,68 @@ function App() {
     setChartData([]);
   };
 
+  const loadFiltersFromURL = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlFilters: ChartFilters = {};
+
+    // Get visa types from URL
+    const visaTypes = urlParams.getAll('visa_type');
+    if (visaTypes.length > 0) {
+      urlFilters.visa_types = visaTypes;
+    }
+
+    // Get occupations from URL
+    const occupations = urlParams.getAll('occupation');
+    if (occupations.length > 0) {
+      urlFilters.occupations = occupations;
+    }
+
+    // Get points from URL
+    const points = urlParams.getAll('points').map(p => parseInt(p)).filter(p => !isNaN(p));
+    if (points.length > 0) {
+      urlFilters.points = points;
+    }
+
+    // Get EOI statuses from URL
+    const eoiStatuses = urlParams.getAll('eoi_status');
+    if (eoiStatuses.length > 0) {
+      urlFilters.eoi_statuses = eoiStatuses;
+    }
+
+    // If we have URL filters, use them; otherwise use default
+    if (Object.keys(urlFilters).length > 0) {
+      setFilters(urlFilters);
+    }
+  };
+
+  const updateURL = (newFilters: ChartFilters) => {
+    const params = new URLSearchParams();
+
+    // Add visa types to URL
+    if (newFilters.visa_types && newFilters.visa_types.length > 0) {
+      newFilters.visa_types.forEach(type => params.append('visa_type', type));
+    }
+
+    // Add occupations to URL
+    if (newFilters.occupations && newFilters.occupations.length > 0) {
+      newFilters.occupations.forEach(occupation => params.append('occupation', occupation));
+    }
+
+    // Add points to URL
+    if (newFilters.points && newFilters.points.length > 0) {
+      newFilters.points.forEach(points => params.append('points', points.toString()));
+    }
+
+    // Add EOI statuses to URL
+    if (newFilters.eoi_statuses && newFilters.eoi_statuses.length > 0) {
+      newFilters.eoi_statuses.forEach(status => params.append('eoi_status', status));
+    }
+
+    // Update URL without page reload
+    const newURL = `${window.location.pathname}${params.toString() ? '?' + params.toString() : ''}`;
+    window.history.replaceState({}, '', newURL);
+  };
+
   const handleApplyFilters = async () => {
     try {
       setLoading(true);
@@ -70,6 +133,7 @@ function App() {
 
   const handleFiltersChange = (newFilters: ChartFilters) => {
     setFilters(newFilters);
+    updateURL(newFilters);
   };
 
   return (
