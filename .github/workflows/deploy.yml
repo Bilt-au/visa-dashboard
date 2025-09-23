@@ -46,11 +46,24 @@ jobs:
       run: |
         python manage.py collectstatic --noinput
 
-    - name: Deploy to Heroku via Docker
-      uses: gonuit/heroku-docker-deploy@v1.3.3
-      with:
-        email: ${{ secrets.HEROKU_EMAIL }}
-        heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-        heroku_app_name: ${{ secrets.HEROKU_APP_NAME }}
-        dockerfile_directory: ./
-        dockerfile_name: Dockerfile
+    - name: Install Heroku CLI manually
+      run: |
+        curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
+        export PATH="/usr/local/bin:$PATH"
+        heroku --version
+
+    - name: Login to Heroku Container Registry
+      env:
+        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+      run: |
+        export PATH="/usr/local/bin:$PATH"
+        echo $HEROKU_API_KEY | heroku auth:token
+        heroku container:login
+
+    - name: Build and Push Docker Image
+      env:
+        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+      run: |
+        export PATH="/usr/local/bin:$PATH"
+        heroku container:push web --app ${{ secrets.HEROKU_APP_NAME }}
+        heroku container:release web --app ${{ secrets.HEROKU_APP_NAME }}
