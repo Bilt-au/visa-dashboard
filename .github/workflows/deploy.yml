@@ -49,7 +49,12 @@ jobs:
           fi
         else
           echo "✗ No frontend package.json found"
+          echo "Root directory contents:"
           ls -la
+          echo "Frontend directory contents:"
+          ls -la frontend/
+          echo "Checking .gitignore for frontend exclusions:"
+          grep -i frontend .gitignore || echo "No frontend entries in .gitignore"
           mkdir -p static staticfiles
           touch static/.gitkeep
         fi
