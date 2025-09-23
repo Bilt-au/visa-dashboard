@@ -27,7 +27,13 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-w&_nnrexf5lfr1nyr#kkv
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = [
+    "ausvisa.bilt.au",
+    "ausvisa.herokuapp.com",
+    "localhost",
+    "127.0.0.1",
+    "*"  # Allow all for now
+]
 
 
 # Application definition
@@ -152,3 +158,18 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+
+# CSRF settings for production
+CSRF_TRUSTED_ORIGINS = [
+    "https://ausvisa.bilt.au",
+    "https://ausvisa.herokuapp.com",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
+# Add production CORS origins
+if not DEBUG:
+    CORS_ALLOWED_ORIGINS += [
+        "https://ausvisa.bilt.au",
+        "https://ausvisa.herokuapp.com",
+    ]
