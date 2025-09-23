@@ -29,27 +29,28 @@ urlpatterns = [
 ]
 
 # Serve React app
-if not settings.DEBUG:
-    # In production, serve the React build
-    urlpatterns += [
-        path('', TemplateView.as_view(template_name='index.html'), name='home'),
-    ]
-else:
-    # In development, show a simple message
-    from django.http import HttpResponse
-    from django.urls import path
+from django.views.generic import RedirectView
+from django.http import HttpResponse
+import os
 
-    def home_view(request):
+def serve_react_app(request):
+    static_root = settings.STATIC_ROOT or os.path.join(settings.BASE_DIR, 'staticfiles')
+    index_path = os.path.join(static_root, 'index.html')
+
+    if os.path.exists(index_path):
+        with open(index_path, 'r') as f:
+            return HttpResponse(f.read(), content_type='text/html')
+    else:
         return HttpResponse("""
         <h1>Django API Server</h1>
         <p>API is running at <a href="/api/">/api/</a></p>
         <p>Admin panel at <a href="/admin/">/admin/</a></p>
-        <p>React frontend should be served separately in development</p>
+        <p>React frontend not found</p>
         """)
 
-    urlpatterns += [
-        path('', home_view, name='home'),
-    ]
+urlpatterns += [
+    path('', serve_react_app, name='home'),
+]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
