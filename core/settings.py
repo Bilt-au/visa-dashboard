@@ -151,7 +151,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CORS settings
 CORS_ALLOWED_ORIGINS = [
-    "https://ausvisa.bilt.au/",  # Add your Vercel domain here
+    "https://ausvisa.bilt.au",  # Add your Vercel domain here
 ]
 
 CORS_ALLOW_CREDENTIALS = True
