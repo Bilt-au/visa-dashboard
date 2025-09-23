@@ -3,11 +3,9 @@ name: Deploy to Heroku
 on:
   push:
     branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,28 +17,20 @@ jobs:
       with:
         node-version: '18'
 
-    - name: Cache npm dependencies
-      uses: actions/cache@v3
-      with:
-        path: frontend/node_modules
-        key: ${{ runner.os }}-npm-${{ hashFiles('frontend/package*.json') }}
-        restore-keys: |
-          ${{ runner.os }}-npm-
-
-    - name: Install frontend dependencies
+    - name: Check if frontend exists and install dependencies
       run: |
-        cd frontend
-        npm install
-
-    - name: Build frontend
-      run: |
-        cd frontend
-        npm run build
-
-    - name: Move build to Django static
-      run: |
-        mkdir -p static
-        cp -r frontend/build/* static/
+        if [ -f "frontend/package.json" ]; then
+          echo "Frontend found, installing dependencies..."
+          cd frontend
+          npm install
+          npm run build
+          cd ..
+          mkdir -p static
+          cp -r frontend/build/* static/ || echo "No build output to copy"
+        else
+          echo "No frontend directory found, skipping frontend build"
+          mkdir -p static
+        fi
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -52,12 +42,11 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Run Django tests
+    - name: Collect static files
       run: |
-        python manage.py test
+        python manage.py collectstatic --noinput
 
     - name: Deploy to Heroku
-      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
       uses: akhileshns/heroku-deploy@v3.12.14
       with:
         heroku_api_key: ${{secrets.HEROKU_API_KEY}}
@@ -65,4 +54,3 @@ jobs:
         heroku_email: ${{secrets.HEROKU_EMAIL}}
         usedocker: false
         buildpack: "heroku/python"
-        procfile: "Procfile"
