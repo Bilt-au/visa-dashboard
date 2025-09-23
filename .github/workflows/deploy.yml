@@ -35,16 +35,15 @@ jobs:
           if [ -d "frontend/build" ]; then
             echo "✓ React build directory found"
             ls -la frontend/build/
-            mkdir -p static staticfiles
-            echo "Copying build files to static directories..."
+            mkdir -p static
+            echo "Copying build files to static directory..."
             cp -r frontend/build/* static/
-            cp -r frontend/build/* staticfiles/
             echo "Files copied. Contents of static directory:"
             ls -la static/
           else
             echo "✗ No frontend build directory found"
             ls -la frontend/
-            mkdir -p static staticfiles
+            mkdir -p static
             touch static/.gitkeep
           fi
         else
@@ -55,7 +54,7 @@ jobs:
           ls -la frontend/
           echo "Checking .gitignore for frontend exclusions:"
           grep -i frontend .gitignore || echo "No frontend entries in .gitignore"
-          mkdir -p static staticfiles
+          mkdir -p static
           touch static/.gitkeep
         fi
 
