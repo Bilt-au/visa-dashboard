@@ -21,24 +21,36 @@ jobs:
 
     - name: Check if frontend exists and install dependencies
       run: |
+        echo "Checking for frontend directory..."
         if [ -f "frontend/package.json" ]; then
-          echo "Frontend found, installing dependencies..."
+          echo "✓ Frontend package.json found"
           cd frontend
+          echo "Installing npm dependencies..."
           npm install
+          echo "Building React app..."
           npm run build
           cd ..
+
+          echo "Checking build output..."
           if [ -d "frontend/build" ]; then
-            echo "Frontend build found, copying to static directory"
-            mkdir -p static
+            echo "✓ React build directory found"
+            ls -la frontend/build/
+            mkdir -p static staticfiles
+            echo "Copying build files to static directories..."
             cp -r frontend/build/* static/
+            cp -r frontend/build/* staticfiles/
+            echo "Files copied. Contents of static directory:"
+            ls -la static/
           else
-            echo "No frontend build found"
-            mkdir -p static
+            echo "✗ No frontend build directory found"
+            ls -la frontend/
+            mkdir -p static staticfiles
             touch static/.gitkeep
           fi
         else
-          echo "No frontend directory found, skipping frontend build"
-          mkdir -p static
+          echo "✗ No frontend package.json found"
+          ls -la
+          mkdir -p static staticfiles
           touch static/.gitkeep
         fi
 
