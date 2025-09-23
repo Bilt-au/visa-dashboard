@@ -100,14 +100,7 @@ const VisaChart: React.FC<VisaChartProps> = ({ data, loading }) => {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: 'right' as const,
-        labels: {
-          usePointStyle: true,
-          padding: 15,
-          maxFontSize: 11,
-          boxWidth: 12,
-          boxHeight: 12,
-        }
+        display: false
       },
       title: {
         display: true,
@@ -125,6 +118,29 @@ const VisaChart: React.FC<VisaChartProps> = ({ data, loading }) => {
         bodyColor: 'white',
         borderColor: 'rgba(255, 255, 255, 0.2)',
         borderWidth: 1,
+        cornerRadius: 8,
+        padding: 12,
+        position: 'nearest' as const,
+        xAlign: 'center' as const,
+        yAlign: 'top' as const,
+        caretPadding: 10,
+        displayColors: true,
+        bodySpacing: 4,
+        titleSpacing: 2,
+        titleMarginBottom: 8,
+        filter: function(tooltipItem: any) {
+          return tooltipItem.parsed.y !== null;
+        },
+        callbacks: {
+          title: function(context: any) {
+            return context[0].label;
+          },
+          label: function(context: any) {
+            const label = context.dataset.label || '';
+            const value = context.parsed.y;
+            return `${label}: ${value} EOIs`;
+          }
+        }
       },
     },
     scales: {
@@ -167,9 +183,7 @@ const VisaChart: React.FC<VisaChartProps> = ({ data, loading }) => {
 
   return (
     <div className="chart-container">
-      <div className="chart-wrapper">
-        <Line data={chartData} options={options} />
-      </div>
+      <Line data={chartData} options={options} />
       <div className="chart-info">
         <p>Showing {datasets.length} data series with {data.length} total records</p>
       </div>
