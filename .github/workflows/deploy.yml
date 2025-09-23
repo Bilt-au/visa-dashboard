@@ -14,49 +14,10 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
-
-    - name: Check if frontend exists and install dependencies
+    - name: Create static directory
       run: |
-        echo "Checking for frontend directory..."
-        if [ -f "frontend/package.json" ]; then
-          echo "✓ Frontend package.json found"
-          cd frontend
-          echo "Installing npm dependencies..."
-          npm install
-          echo "Building React app..."
-          npm run build
-          cd ..
-
-          echo "Checking build output..."
-          if [ -d "frontend/build" ]; then
-            echo "✓ React build directory found"
-            ls -la frontend/build/
-            mkdir -p static
-            echo "Copying build files to static directory..."
-            cp -r frontend/build/* static/
-            echo "Files copied. Contents of static directory:"
-            ls -la static/
-          else
-            echo "✗ No frontend build directory found"
-            ls -la frontend/
-            mkdir -p static
-            touch static/.gitkeep
-          fi
-        else
-          echo "✗ No frontend package.json found"
-          echo "Root directory contents:"
-          ls -la
-          echo "Frontend directory contents:"
-          ls -la frontend/
-          echo "Checking .gitignore for frontend exclusions:"
-          grep -i frontend .gitignore || echo "No frontend entries in .gitignore"
-          mkdir -p static
-          touch static/.gitkeep
-        fi
+        mkdir -p static
+        echo "Frontend now deployed separately on Vercel" > static/README.txt
 
     - name: Set up Python
       uses: actions/setup-python@v4

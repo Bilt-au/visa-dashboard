@@ -151,20 +151,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CORS settings
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "http://localhost:3001",
-    "http://127.0.0.1:3001",
+    "https://ausvisa.bilt.au/",  # Add your Vercel domain here
 ]
 
 CORS_ALLOW_CREDENTIALS = True
 
 # CSRF settings for production
 CSRF_TRUSTED_ORIGINS = [
-    "https://ausvisa.bilt.au",
-    "https://ausvisa.herokuapp.com",
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
+    "https://ausvisa.bilt.au/",
 ]
 
 # Add production CORS origins

@@ -1,7 +1,9 @@
 import axios from 'axios';
 import { ApiResponse, FilterOptions, ChartFilters } from '../types/api';
 
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = process.env.NODE_ENV === 'production'
+  ? 'https://ausvisa-backend.built.au/api'
+  : 'http://localhost:8000/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
