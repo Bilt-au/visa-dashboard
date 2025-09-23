@@ -23,30 +23,32 @@ class ExcelImportService:
     def process_excel_file(self, file_path):
         self.validate_file(file_path)
 
-        # Read in chunks to handle large files
-        chunk_size = 1000
+        # Read the entire Excel file
+        df = pd.read_excel(file_path)
+
         results = {
-            'total_rows': 0,
+            'total_rows': len(df),
             'processed': 0,
             'errors': []
         }
 
-        # First, get total rows
-        df_sample = pd.read_excel(file_path, nrows=1)
-        results['total_rows'] = len(pd.read_excel(file_path))
+        # Process in chunks to avoid memory issues
+        chunk_size = 1000
 
-        # Process in chunks
-        for chunk_df in pd.read_excel(file_path, chunksize=chunk_size):
-            self._process_chunk(chunk_df, results)
-
-        return results
-
-    def _process_chunk(self, chunk_df, results):
         # Pre-fetch existing objects to reduce DB queries
         existing_visa_types = {vt.name: vt for vt in VisaType.objects.all()}
         existing_occupations = {oc.name: oc for oc in Occupation.objects.all()}
         existing_month_years = {my.name: my for my in MonthYear.objects.all()}
 
+        for start_idx in range(0, len(df), chunk_size):
+            end_idx = min(start_idx + chunk_size, len(df))
+            chunk_df = df.iloc[start_idx:end_idx]
+
+            self._process_chunk(chunk_df, results, existing_visa_types, existing_occupations, existing_month_years)
+
+        return results
+
+    def _process_chunk(self, chunk_df, results, existing_visa_types, existing_occupations, existing_month_years):
         visa_data_objects = []
 
         for index, row in chunk_df.iterrows():
