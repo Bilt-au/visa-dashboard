@@ -22,23 +22,47 @@ class ExcelImportService:
 
     def process_excel_file(self, file_path):
         self.validate_file(file_path)
-        df = pd.read_excel(file_path)
 
+        # Read in chunks to handle large files
+        chunk_size = 1000
         results = {
-            'total_rows': len(df),
+            'total_rows': 0,
             'processed': 0,
             'errors': []
         }
 
-        with transaction.atomic():
-            for index, row in df.iterrows():
-                try:
-                    self._process_row(row)
-                    results['processed'] += 1
-                except Exception as e:
-                    results['errors'].append(f"Row {index + 1}: {str(e)}")
+        # First, get total rows
+        df_sample = pd.read_excel(file_path, nrows=1)
+        results['total_rows'] = len(pd.read_excel(file_path))
+
+        # Process in chunks
+        for chunk_df in pd.read_excel(file_path, chunksize=chunk_size):
+            self._process_chunk(chunk_df, results)
 
         return results
+
+    def _process_chunk(self, chunk_df, results):
+        # Pre-fetch existing objects to reduce DB queries
+        existing_visa_types = {vt.name: vt for vt in VisaType.objects.all()}
+        existing_occupations = {oc.name: oc for oc in Occupation.objects.all()}
+        existing_month_years = {my.name: my for my in MonthYear.objects.all()}
+
+        visa_data_objects = []
+
+        for index, row in chunk_df.iterrows():
+            try:
+                # Process row and create object (don't save yet)
+                visa_data = self._prepare_visa_data_object(
+                    row, existing_visa_types, existing_occupations, existing_month_years
+                )
+                visa_data_objects.append(visa_data)
+                results['processed'] += 1
+            except Exception as e:
+                results['errors'].append(f"Row {index + 1}: {str(e)}")
+
+        # Bulk create all objects at once
+        if visa_data_objects:
+            VisaData.objects.bulk_create(visa_data_objects, ignore_conflicts=True)
 
     def _process_row(self, row):
         month_year = self._get_or_create_month_year(row['As At Month'])
@@ -81,6 +105,45 @@ class ExcelImportService:
             name=occupation_str
         )
         return occupation
+
+    def _prepare_visa_data_object(self, row, existing_visa_types, existing_occupations, existing_month_years):
+        # Get or create related objects
+        month_year_name = str(row['As At Month']).strip()
+        if month_year_name not in existing_month_years:
+            month_year = MonthYear.objects.create(name=month_year_name)
+            existing_month_years[month_year_name] = month_year
+        else:
+            month_year = existing_month_years[month_year_name]
+
+        visa_type_name = str(row['Visa Type']).strip()
+        if visa_type_name not in existing_visa_types:
+            visa_type = VisaType.objects.create(name=visa_type_name)
+            existing_visa_types[visa_type_name] = visa_type
+        else:
+            visa_type = existing_visa_types[visa_type_name]
+
+        occupation_name = str(row['Occupation']).strip()
+        if occupation_name not in existing_occupations:
+            occupation = Occupation.objects.create(name=occupation_name)
+            existing_occupations[occupation_name] = occupation
+        else:
+            occupation = existing_occupations[occupation_name]
+
+        eoi_status = str(row['EOI Status']).upper()
+        if eoi_status not in [choice[0] for choice in VisaData.Status.choices]:
+            raise ValueError(f"Invalid EOI Status: {eoi_status}")
+
+        points = self._process_points_or_count(row['Points'])
+        count_eois = self._process_points_or_count(row['Count EOIs'])
+
+        return VisaData(
+            month_year=month_year,
+            visa_type=visa_type,
+            occupation=occupation,
+            status=eoi_status,
+            points=points,
+            count=count_eois
+        )
 
     def _process_points_or_count(self, value):
         value_str = str(value).strip()
