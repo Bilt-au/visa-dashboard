@@ -176,7 +176,7 @@ function App() {
               SkillSelect Data API
             </a>
           </p>
-          <p>Built with ❤️ by <a href="https://www.linkedin.com/in/m4td3v" target="_blank" rel="noopener noreferrer" style={{ color: '#FFF' }}>Matt</a></p>
+          <p>Bilt with ❤️ by <a href="https://www.linkedin.com/in/m4td3v" target="_blank" rel="noopener noreferrer" style={{ color: '#FFF' }}>Matt</a></p>
         
         <br></br>
         <BuyMeACoffeeButton className="footer-coffee" />

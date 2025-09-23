@@ -60,10 +60,12 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
     label: occupation
   }));
 
-  const pointsOptions: SelectOption[] = filterOptions.points.map(points => ({
-    value: points,
-    label: points.toString()
-  }));
+  const pointsOptions: SelectOption[] = filterOptions.points
+    .filter(points => points >= 65)
+    .map(points => ({
+      value: points,
+      label: points.toString()
+    }));
 
   const statusOptions: SelectOption[] = filterOptions.eoi_statuses.map(status => ({
     value: status,

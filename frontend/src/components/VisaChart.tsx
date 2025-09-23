@@ -97,13 +97,16 @@ const VisaChart: React.FC<VisaChartProps> = ({ data, loading }) => {
 
   const options = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: 'top' as const,
+        position: 'right' as const,
         labels: {
           usePointStyle: true,
-          padding: 20,
-          maxFontSize: 12,
+          padding: 15,
+          maxFontSize: 11,
+          boxWidth: 12,
+          boxHeight: 12,
         }
       },
       title: {
@@ -164,7 +167,9 @@ const VisaChart: React.FC<VisaChartProps> = ({ data, loading }) => {
 
   return (
     <div className="chart-container">
-      <Line data={chartData} options={options} />
+      <div className="chart-wrapper">
+        <Line data={chartData} options={options} />
+      </div>
       <div className="chart-info">
         <p>Showing {datasets.length} data series with {data.length} total records</p>
       </div>
