@@ -46,16 +46,11 @@ jobs:
       run: |
         python manage.py collectstatic --noinput
 
-    - name: Setup Heroku CLI
-      uses: extractions/setup-heroku@v1
+    - name: Deploy to Heroku via Docker
+      uses: gonuit/heroku-docker-deploy@v1.3.3
       with:
-        api-key: ${{ secrets.HEROKU_API_KEY }}
-
-    - name: Deploy to Heroku
-      run: |
-        git config --global user.email "action@github.com"
-        git config --global user.name "GitHub Action"
-        git remote add heroku https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/${{ secrets.HEROKU_APP_NAME }}.git
-        git add .
-        git commit -m "Deploy from GitHub Actions" || echo "No changes to commit"
-        git push heroku HEAD:main --force
+        email: ${{ secrets.HEROKU_EMAIL }}
+        heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+        heroku_app_name: ${{ secrets.HEROKU_APP_NAME }}
+        dockerfile_directory: ./
+        dockerfile_name: Dockerfile
