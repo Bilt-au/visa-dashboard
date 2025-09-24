@@ -278,6 +278,53 @@ const VisaChart: React.FC<VisaChartProps> = ({ data, loading }) => {
                 </tr>
               ))}
             </tbody>
+            <tfoot>
+              <tr style={{
+                backgroundColor: '#f0f0f0',
+                fontWeight: 'bold',
+                borderTop: '2px solid #333'
+              }}>
+                <td style={{
+                  padding: '8px',
+                  border: '1px solid #ddd',
+                  fontWeight: 'bold',
+                  minWidth: '300px',
+                  whiteSpace: 'nowrap',
+                  textOverflow: 'ellipsis',
+                  overflow: 'hidden'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}>
+                    <div style={{
+                      width: '12px',
+                      height: '12px',
+                      backgroundColor: '#333',
+                      borderRadius: '2px'
+                    }}></div>
+                    TOTAL
+                  </div>
+                </td>
+                {allMonthYears.map((monthYear, monthIndex) => {
+                  const monthTotal = datasets.reduce((sum, dataset) => {
+                    return sum + (dataset.data[monthIndex] || 0);
+                  }, 0);
+                  return (
+                    <td key={monthYear} style={{
+                      padding: '8px',
+                      border: '1px solid #ddd',
+                      textAlign: 'center',
+                      fontWeight: 'bold',
+                      backgroundColor: '#e8e8e8'
+                    }}>
+                      {monthTotal}
+                    </td>
+                  );
+                })}
+              </tr>
+            </tfoot>
           </table>
           <p style={{
             fontSize: '11px',
