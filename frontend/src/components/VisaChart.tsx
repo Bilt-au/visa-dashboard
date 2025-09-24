@@ -129,7 +129,7 @@ const VisaChart: React.FC<VisaChartProps> = ({ data, loading }) => {
         titleSpacing: 2,
         titleMarginBottom: 8,
         filter: function(tooltipItem: any) {
-          return tooltipItem.parsed.y !== null;
+          return tooltipItem.parsed.y !== null && tooltipItem.parsed.y > 0;
         },
         callbacks: {
           title: function(context: any) {
@@ -139,6 +139,9 @@ const VisaChart: React.FC<VisaChartProps> = ({ data, loading }) => {
             const label = context.dataset.label || '';
             const value = context.parsed.y;
             return `${label}: ${value} EOIs`;
+          },
+          afterBody: function() {
+            return ['', '⚠️ Note: Values <20 are considered as 0'];
           }
         }
       },
