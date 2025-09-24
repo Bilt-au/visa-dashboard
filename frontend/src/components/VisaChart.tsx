@@ -247,8 +247,10 @@ const VisaChart: React.FC<VisaChartProps> = ({ data, loading }) => {
                     padding: '8px',
                     border: '1px solid #ddd',
                     fontWeight: 'bold',
-                    maxWidth: '200px',
-                    wordBreak: 'break-word'
+                    minWidth: '300px',
+                    whiteSpace: 'nowrap',
+                    textOverflow: 'ellipsis',
+                    overflow: 'hidden'
                   }}>
                     <div style={{
                       display: 'flex',
