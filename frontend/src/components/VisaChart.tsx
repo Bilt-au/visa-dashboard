@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -28,6 +28,7 @@ interface VisaChartProps {
 }
 
 const VisaChart: React.FC<VisaChartProps> = ({ data, loading }) => {
+  const [showTable, setShowTable] = useState(false);
   if (loading) {
     return <div className="chart-container loading">Loading chart...</div>;
   }
@@ -133,11 +134,11 @@ const VisaChart: React.FC<VisaChartProps> = ({ data, loading }) => {
         },
         callbacks: {
           title: function(context: any) {
-            return context[0].label;
+            return context && context.length > 0 && context[0] ? context[0].label : '';
           },
           label: function(context: any) {
-            const label = context.dataset.label || '';
-            const value = context.parsed.y;
+            const label = context?.dataset?.label || '';
+            const value = context?.parsed?.y || 0;
             return `${label}: ${value} EOIs`;
           },
           afterBody: function() {
@@ -186,10 +187,106 @@ const VisaChart: React.FC<VisaChartProps> = ({ data, loading }) => {
 
   return (
     <div className="chart-container">
-      <Line data={chartData} options={options} />
+      <div className="chart-wrapper">
+        <Line data={chartData} options={options} />
+      </div>
       <div className="chart-info">
         <p>Showing {datasets.length} data series with {data.length} total records</p>
+        <button
+          onClick={() => setShowTable(!showTable)}
+          style={{
+            marginTop: '10px',
+            padding: '8px 16px',
+            backgroundColor: '#36A2EB',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontSize: '14px'
+          }}
+        >
+          {showTable ? '▲ Hide Data Table' : '▼ Show Data Table'}
+        </button>
       </div>
+
+      {showTable && (
+        <div className="data-table-container" style={{ marginTop: '20px', overflowX: 'auto' }}>
+          <h4 style={{ marginBottom: '10px' }}>Chart Data Values</h4>
+          <table style={{
+            width: '100%',
+            borderCollapse: 'collapse',
+            fontSize: '12px',
+            border: '1px solid #ddd'
+          }}>
+            <thead>
+              <tr style={{ backgroundColor: '#f5f5f5' }}>
+                <th style={{ padding: '8px', border: '1px solid #ddd', textAlign: 'left' }}>
+                  Series
+                </th>
+                {allMonthYears.map(monthYear => (
+                  <th key={monthYear} style={{
+                    padding: '8px',
+                    border: '1px solid #ddd',
+                    textAlign: 'center',
+                    minWidth: '80px'
+                  }}>
+                    {new Date(monthYear).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'short'
+                    })}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {datasets.map((dataset, index) => (
+                <tr key={index} style={{
+                  backgroundColor: index % 2 === 0 ? 'white' : '#f9f9f9'
+                }}>
+                  <td style={{
+                    padding: '8px',
+                    border: '1px solid #ddd',
+                    fontWeight: 'bold',
+                    maxWidth: '200px',
+                    wordBreak: 'break-word'
+                  }}>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}>
+                      <div style={{
+                        width: '12px',
+                        height: '12px',
+                        backgroundColor: dataset.borderColor,
+                        borderRadius: '2px'
+                      }}></div>
+                      {dataset.label}
+                    </div>
+                  </td>
+                  {dataset.data.map((value, valueIndex) => (
+                    <td key={valueIndex} style={{
+                      padding: '8px',
+                      border: '1px solid #ddd',
+                      textAlign: 'center'
+                    }}>
+                      {value}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p style={{
+            fontSize: '11px',
+            color: '#666',
+            marginTop: '10px',
+            fontStyle: 'italic'
+          }}>
+            ⚠️ Note: Values &lt;20 are considered as 0
+          </p>
+        </div>
+      )}
     </div>
   );
 };

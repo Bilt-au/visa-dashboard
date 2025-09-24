@@ -303,6 +303,10 @@ body {
 
 .chart-container {
   position: relative;
+  margin-bottom: 1rem;
+}
+
+.chart-container .chart-wrapper {
   height: 500px;
   margin-bottom: 1rem;
 }
@@ -315,7 +319,8 @@ body {
 
 /* Custom legend scrollability for Chart.js */
 .chart-wrapper canvas {
-  max-width: 75%;
+  width: 100% !important;
+  max-width: 100%;
 }
 
 /* Override Chart.js legend positioning for scrollable legend */
@@ -720,7 +725,7 @@ body {
     gap: 1rem;
   }
 
-  .chart-container {
+  .chart-container .chart-wrapper {
     height: 400px;
   }
 
@@ -762,7 +767,7 @@ body {
     padding: 1rem;
   }
 
-  .chart-container {
+  .chart-container .chart-wrapper {
     height: 350px;
   }
 

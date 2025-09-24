@@ -162,8 +162,9 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 # Add production CORS origins
-if not DEBUG:
+if DEBUG:
     CORS_ALLOWED_ORIGINS += [
         "https://ausvisa.bilt.au",
-        "https://ausvisa.herokuapp.com",
+        "http://localhost:3000",
+        "http://localhost:3002",
     ]
