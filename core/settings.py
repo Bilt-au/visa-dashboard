@@ -89,7 +89,7 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
+        default=f'postgres://ausvisa:jQ36z8%23p8xzg8QXx4j07@general.cczma8wksafr.us-east-1.rds.amazonaws.com:5432/ausvisa',
         conn_max_age=600,
         conn_health_checks=True,
     )
