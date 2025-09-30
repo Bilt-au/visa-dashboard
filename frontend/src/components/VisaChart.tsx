@@ -272,7 +272,7 @@ const VisaChart: React.FC<VisaChartProps> = ({ data, loading }) => {
                       border: '1px solid #ddd',
                       textAlign: 'center'
                     }}>
-                      {value >= 20 ? value : '<20'}
+                      {value === 5 ? '<20' : value }
                     </td>
                   ))}
                 </tr>
@@ -308,8 +308,13 @@ const VisaChart: React.FC<VisaChartProps> = ({ data, loading }) => {
                   </div>
                 </td>
                 {allMonthYears.map((monthYear, monthIndex) => {
+                  let lttwenty = false;
                   const monthTotal = datasets.reduce((sum, dataset) => {
-                    return sum + (dataset.data[monthIndex] == 5 ? 1 : dataset.data[monthIndex] || 0);
+                    const value = dataset.data[monthIndex] === 5 ? 0 : dataset.data[monthIndex] || 0;
+                    if (dataset.data[monthIndex] === 5 ) {
+                      lttwenty = true;
+                    }
+                    return sum + value;
                   }, 0);
 
                   return (
@@ -320,7 +325,7 @@ const VisaChart: React.FC<VisaChartProps> = ({ data, loading }) => {
                       fontWeight: 'bold',
                       backgroundColor: '#e8e8e8'
                     }}>
-                      {monthTotal < 20 ? '<20' : monthTotal}
+                      {monthTotal < 20  && lttwenty ? '<20' : monthTotal}
                     </td>
                   );
                 })}
