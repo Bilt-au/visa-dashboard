@@ -142,7 +142,7 @@ const VisaChart: React.FC<VisaChartProps> = ({ data, loading }) => {
             return `${label}: ${value} EOIs`;
           },
           afterBody: function() {
-            return ['', '⚠️ Note: Values <20 are considered as 0'];
+            return ['', '⚠️ Note: Values <20 are considered as 5, which indicates above 0 but less than 20'];
           }
         }
       },

@@ -150,7 +150,7 @@ class ExcelImportService:
     def _process_points_or_count(self, value):
         value_str = str(value).strip()
         if value_str == "<20":
-            return 0
+            return 5
         try:
             return int(float(value_str))
         except (ValueError, TypeError):
